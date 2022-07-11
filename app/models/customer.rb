@@ -1,3 +1,4 @@
-class Customer < ApplicationRecord 
+# frozen_string_literal: true
 
+class Customer < ApplicationRecord
 end
