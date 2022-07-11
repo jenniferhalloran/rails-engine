@@ -6,7 +6,7 @@ RSpec.describe "Merchants API" do
 
         get '/api/v1/merchants'
 
-        expect(response).to be_succesful
+        expect(response).to be_successful
     end
     
 end
