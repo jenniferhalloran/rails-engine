@@ -7,7 +7,7 @@ RSpec.describe 'Items API' do
         id = create(:merchant).id
         create_list(:item, 3, merchant_id: id)
 
-        get 'api/v1/items'
+        get '/api/v1/items'
 
         expect(response).to be_successful
     end
