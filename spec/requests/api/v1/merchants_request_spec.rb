@@ -77,4 +77,19 @@ RSpec.describe 'Merchants API' do
     expect(result[:attributes][:name]).to eq('Crate And Barrel')
     expect(result[:attributes][:name]).to_not eq('Lands End')
   end
+
+  it 'returns a 404 error if there is no match' do
+    merchant1 = create(:merchant, name: 'Lands End')
+    merchant2 = create(:merchant, name: 'Crate And Barrel')
+    merchant3 = create(:merchant, name: 'REI')
+    merchant4 = create(:merchant, name: 'Patagonia')
+
+    get '/api/v1/merchants/find?name=cats'
+
+    expect(response.status).to eq(200)
+
+    result = JSON.parse(response.body, symbolize_names: true)
+    expect(result).to have_key(:data)
+    expect(result[:data][:errors]).to eq("No match was found.")
+  end
 end

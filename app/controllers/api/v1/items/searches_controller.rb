@@ -6,8 +6,11 @@ module Api
       class SearchesController < ApplicationController
         def index
           match = Merchant.name_search(params[:name])
-
-          render json: MerchantSerializer.new(match)
+          if match.nil?
+            render json: {data: {errors: "No match was found."}}
+          else
+            render json: MerchantSerializer.new(match)
+          end
         end
       end
     end
