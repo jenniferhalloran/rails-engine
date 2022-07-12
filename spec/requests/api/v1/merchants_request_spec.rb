@@ -26,9 +26,9 @@ RSpec.describe 'Merchants API' do
     id = create(:merchant).id
     get "/api/v1/merchants/#{id}"
 
-    merchant = JSON.parse(response.body, symbolize_names: true)[:data]
-
     expect(response).to be_successful
+
+    merchant = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(merchant).to have_key(:id)
 
@@ -44,9 +44,9 @@ RSpec.describe 'Merchants API' do
 
     get "/api/v1/merchants/#{id}/items"
 
-    items = JSON.parse(response.body, symbolize_names: true)[:data]
-
     expect(response).to be_successful
+
+    items = JSON.parse(response.body, symbolize_names: true)[:data]
 
     expect(items.count).to eq(4)
 
@@ -58,5 +58,23 @@ RSpec.describe 'Merchants API' do
       expect(item[:attributes][:description]).to be_a(String)
     end
   end
-  # #sad path?
+
+  it 'returns a single merchant that matches a seach term' do
+    merchant1 = create(:merchant, name: 'Lands End')
+    merchant2 = create(:merchant, name: 'Crate And Barrel')
+    merchant3 = create(:merchant, name: 'REI')
+    merchant4 = create(:merchant, name: 'Patagonia')
+
+    get '/api/v1/merchants/find?name=And'
+
+    expect(response.status).to eq(200)
+
+    result = JSON.parse(response.body, symbolize_names: true)[:data]
+
+    expect(result).to have_key(:id)
+
+    expect(result[:attributes]).to have_key(:name)
+    expect(result[:attributes][:name]).to eq('Crate And Barrel')
+    expect(result[:attributes][:name]).to_not eq('Lands End')
+  end
 end
