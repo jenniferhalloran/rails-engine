@@ -78,5 +78,16 @@ RSpec.describe 'Items API' do
     expect(item.description).to_not eq(previous_description)
     expect(item.description).to eq("No. Please take that off. You look like a homeless Pencil.")
   end
+
+  it "returns a 404 error if the id is a string" do
+    item = create(:item)
+    item_params = {merchant_id: "99"}
+
+    patch "/api/v1/items/#{item.id}", params: { item: item_params}, as: :json    
+    
+    expect(response.status).to eq(404)
+
+    expect(item.id).to_not eq("99")    
+  end
   
 end
