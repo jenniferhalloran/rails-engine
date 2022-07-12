@@ -8,7 +8,7 @@ RSpec.describe 'Merchants API' do
 
     get '/api/v1/merchants'
 
-    expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     merchants = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -26,7 +26,7 @@ RSpec.describe 'Merchants API' do
     id = create(:merchant).id
     get "/api/v1/merchants/#{id}"
 
-    expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     merchant = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -44,7 +44,7 @@ RSpec.describe 'Merchants API' do
 
     get "/api/v1/merchants/#{id}/items"
 
-    expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     items = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -60,10 +60,10 @@ RSpec.describe 'Merchants API' do
   end
 
   it 'returns a single merchant that matches a seach term' do
-    merchant1 = create(:merchant, name: 'Lands End')
-    merchant2 = create(:merchant, name: 'Crate And Barrel')
-    merchant3 = create(:merchant, name: 'REI')
-    merchant4 = create(:merchant, name: 'Patagonia')
+    create(:merchant, name: 'Lands End')
+    create(:merchant, name: 'Crate And Barrel')
+    create(:merchant, name: 'REI')
+    create(:merchant, name: 'Patagonia')
 
     get '/api/v1/merchants/find?name=And'
 
@@ -78,11 +78,11 @@ RSpec.describe 'Merchants API' do
     expect(result[:attributes][:name]).to_not eq('Lands End')
   end
 
-  it 'returns a 404 error if there is no match' do
-    merchant1 = create(:merchant, name: 'Lands End')
-    merchant2 = create(:merchant, name: 'Crate And Barrel')
-    merchant3 = create(:merchant, name: 'REI')
-    merchant4 = create(:merchant, name: 'Patagonia')
+  it 'does not return a 404 error if there are no matches' do
+    create(:merchant, name: 'Lands End')
+    create(:merchant, name: 'Crate And Barrel')
+    create(:merchant, name: 'REI')
+    create(:merchant, name: 'Patagonia')
 
     get '/api/v1/merchants/find?name=cats'
 

@@ -9,7 +9,7 @@ RSpec.describe 'Items API' do
 
     get '/api/v1/items'
 
-    expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     items = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -31,7 +31,7 @@ RSpec.describe 'Items API' do
 
     get "/api/v1/items/#{id}"
 
-    expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     item = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -54,7 +54,7 @@ RSpec.describe 'Items API' do
     }
     post '/api/v1/items', params: { item: item_params }, as: :json
 
-    expect(response).to be_successful
+    expect(response.status).to eq(201)
 
     item = Item.last
 
@@ -74,7 +74,7 @@ RSpec.describe 'Items API' do
 
     item = Item.find(id)
 
-    expect(response).to be_successful
+    expect(response.status).to eq(200)
     expect(item.description).to_not eq(previous_description)
     expect(item.description).to eq('No. Please take that off. You look like a homeless Pencil.')
   end
@@ -105,7 +105,7 @@ RSpec.describe 'Items API' do
 
     get "/api/v1/items/#{item.id}/merchant"
 
-    expect(response).to be_successful
+    expect(response.status).to eq(200)
 
     merchant = JSON.parse(response.body, symbolize_names: true)[:data]
 
@@ -113,5 +113,45 @@ RSpec.describe 'Items API' do
 
     expect(merchant[:attributes]).to have_key(:name)
     expect(merchant[:attributes][:name]).to be_a(String)
+  end
+
+  it 'can return all items that match a search term' do
+    item1 = create(:item, name: 'Backpack')
+    item2 = create(:item, name: 'Hiking Boots')
+    item2 = create(:item, name: 'Gumboot')
+    item3 = create(:item, name: 'Tent')
+    item4 = create(:item, name: 'Harness')
+
+    get '/api/v1/items/find_all?name=boot'
+
+    expect(response.status).to eq(200)
+
+    items = JSON.parse(response.body, symbolize_names: true)[:data]
+    expect(items.count).to eq(2)
+
+    items.each do |item|
+      expect(item).to have_key(:id)
+      expect(item[:attributes]).to include(:name, :description, :unit_price, :merchant_id)
+
+      expect(item[:attributes][:name]).to be_a(String)
+      expect(item[:attributes][:description]).to be_a(String)
+      expect(item[:attributes][:unit_price]).to be_a(Float)
+      expect(item[:attributes][:merchant_id]).to be_an(Integer)
+    end
+  end
+
+  it 'does not return a 404 error if there are no matches' do
+    create(:item, name: 'Backpack')
+    create(:item, name: 'Tent')
+    create(:item, name: 'Harness')
+
+    get '/api/v1/items/find_all?name=boot'
+
+    expect(response.status).to eq(200)
+
+    result = JSON.parse(response.body, symbolize_names: true)
+
+    expect(result).to have_key(:data)
+    expect(result[:data]).to eq([])
   end
 end
