@@ -91,21 +91,27 @@ RSpec.describe 'Items API' do
   end
 
   it 'can delete an item' do
-
     item = create(:item)
 
     delete "/api/v1/items/#{item.id}"
 
     expect(response).to be_successful
-    expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+    expect { Item.find(item.id) }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
-
-  it "can return the merchant associated with an item" do
+  it 'can return the merchant associated with an item' do
     id = create(:merchant).id
     item = create(:item, merchant_id: id)
 
     get "/api/v1/items/#{item.id}/merchant"
-    
+
+    expect(response).to be_successful
+
+    merchant = JSON.parse(response.body, symbolize_names: true)[:data]
+
+    expect(merchant).to have_key(:id)
+
+    expect(merchant[:attributes]).to have_key(:name)
+    expect(merchant[:attributes][:name]).to be_a(String)
   end
 end
