@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Items API' do
-  it 'sends a list of merchants' do
+  it 'sends a list of items' do
     id = create(:merchant).id
     create_list(:item, 3, merchant_id: id)
 
@@ -25,4 +25,13 @@ RSpec.describe 'Items API' do
       expect(item[:attributes][:merchant_id]).to eq(id)
     end
   end
+
+  it "can return one item by its id" do
+    id = create(:item).id
+    
+    get "/api/v1/items/#{id}"
+
+    expect(response).to be_successful    
+  end
+  
 end
