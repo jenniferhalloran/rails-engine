@@ -65,29 +65,38 @@ RSpec.describe 'Items API' do
     expect(item.merchant_id).to eq(id)
   end
 
-  it "can edit an existing item" do
+  it 'can edit an existing item' do
     id = create(:item).id
     previous_description = Item.last.description
-    item_params = {description: "No. Please take that off. You look like a homeless Pencil."}
+    item_params = { description: 'No. Please take that off. You look like a homeless Pencil.' }
 
-    patch "/api/v1/items/#{id}", params: { item: item_params}, as: :json
+    patch "/api/v1/items/#{id}", params: { item: item_params }, as: :json
 
     item = Item.find(id)
 
     expect(response).to be_successful
     expect(item.description).to_not eq(previous_description)
-    expect(item.description).to eq("No. Please take that off. You look like a homeless Pencil.")
+    expect(item.description).to eq('No. Please take that off. You look like a homeless Pencil.')
   end
 
-  it "returns a 404 error if the id is a string" do
+  it 'returns a 404 error if the id is a string' do
     item = create(:item)
-    item_params = {merchant_id: "99"}
+    item_params = { merchant_id: '99' }
 
-    patch "/api/v1/items/#{item.id}", params: { item: item_params}, as: :json    
-    
+    patch "/api/v1/items/#{item.id}", params: { item: item_params }, as: :json
+
     expect(response.status).to eq(404)
 
-    expect(item.id).to_not eq("99")    
+    expect(item.id).to_not eq('99')
   end
-  
+
+  it 'can delete an item' do
+
+    item = create(:item)
+
+    delete "/api/v1/items/#{item.id}"
+
+    expect(response).to be_successful
+    expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+  end
 end

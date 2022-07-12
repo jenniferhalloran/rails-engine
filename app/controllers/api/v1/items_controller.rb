@@ -24,6 +24,10 @@ module Api
         end
       end
 
+      def destroy
+        render json: Item.delete(params[:id])
+      end
+
       private
 
       def item_params
