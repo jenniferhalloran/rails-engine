@@ -44,5 +44,19 @@ RSpec.describe 'Items API' do
     expect(item[:attributes][:merchant_id]).to be_an(Integer)
 
   end
+
+  it "can create a new item" do
+    item_params = ({
+                    name: "Schmidts Suede Pants",
+                    description: "I can't cure damaged suede",
+                    unit_price: 199.0,
+                    merchant_id: 4
+                  })
+     post '/api/v1/items', params: { item: item_params }, as: :json
+     
+     expect(response).to be_successful
+  end
+  
+  
   
 end
