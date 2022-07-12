@@ -90,6 +90,6 @@ RSpec.describe 'Merchants API' do
 
     result = JSON.parse(response.body, symbolize_names: true)
     expect(result).to have_key(:data)
-    expect(result[:data][:errors]).to eq("No match was found.")
+    expect(result[:data][:errors]).to eq('No match was found.')
   end
 end

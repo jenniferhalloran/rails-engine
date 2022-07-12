@@ -7,7 +7,7 @@ module Api
         def index
           match = Merchant.name_search(params[:name])
           if match.nil?
-            render json: {data: {errors: "No match was found."}}
+            render json: { data: { errors: 'No match was found.' } }
           else
             render json: MerchantSerializer.new(match)
           end
