@@ -3,9 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Merchant, type: :model do
-  # describe 'relationships' do
-  #     it { should have_many :items}
-  # end
+  describe 'relationships' do
+      it { should have_many :items}
+  end
 
   describe 'class methods' do
     describe 'name_search_first(keyword)' do
