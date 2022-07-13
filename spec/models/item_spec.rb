@@ -4,11 +4,11 @@ require 'rails_helper'
 
 RSpec.describe Item, type: :model do
   describe 'relationships' do
-    it { should belong_to :merchant}
-    it { should have_many :invoice_items}
-    it { should have_many(:invoices).through(:invoice_items)}
+    it { should belong_to :merchant }
+    it { should have_many :invoice_items }
+    it { should have_many(:invoices).through(:invoice_items) }
   end
-  
+
   describe 'class methods' do
     describe 'name_search_all(keyword)' do
       it 'returns all items with names that partially match the keyword' do
@@ -26,7 +26,7 @@ RSpec.describe Item, type: :model do
         item = create(:item)
 
         expect(Item.item_exists?(item.id)).to eq(true)
-        expect(Item.item_exists?(item.id+1)).to eq(false)
+        expect(Item.item_exists?(item.id + 1)).to eq(false)
       end
     end
   end

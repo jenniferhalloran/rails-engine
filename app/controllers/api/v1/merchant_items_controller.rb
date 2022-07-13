@@ -17,3 +17,12 @@ module Api
     end
   end
 end
+
+# def index
+#   if Merchant.merchant_exists?(params[:merchant_id])
+#     merchant = Merchant.find(params[:merchant_id])
+#     render json: ItemSerializer.new(merchant.items)
+#   else
+#     render status: 404
+#   end
+# end

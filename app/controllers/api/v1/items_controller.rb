@@ -20,21 +20,22 @@ module Api
         if item.save
           render json: ItemSerializer.new(item), status: :created
         else
-          render json: { data: { errors: item.errors.full_messages }}
+          render json: { data: { errors: item.errors.full_messages } }
         end
       end
 
       def update
         item = Item.update(params[:id], item_params)
         if item.save
-          render json: ItemSerializer.new(item)
+          render json: ItemSerializer.new(item), status: :created
         else
           render status: 404
         end
       end
 
       def destroy
-        render json: Item.delete(params[:id])
+        Item.delete(params[:id])
+        render status: 204
       end
 
       private
