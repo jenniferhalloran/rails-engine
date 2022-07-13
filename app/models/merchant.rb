@@ -5,8 +5,12 @@ class Merchant < ApplicationRecord
 
   def self.name_search_first(keyword)
     where('name ilike ?', "%#{keyword.downcase}%")
-    .order(self.arel_table['name'].lower)
-    # .order('LOWER(name)')   --> avoid deprecation warning
-    .first
+      .order(arel_table['name'].lower)
+      # .order('LOWER(name)')   --> avoid deprecation warning
+      .first
+  end
+
+  def self.merchant_exists?(id)
+    where(id: id).exists?
   end
 end

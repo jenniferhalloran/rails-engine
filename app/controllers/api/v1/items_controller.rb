@@ -8,24 +8,34 @@ module Api
       end
 
       def show
-        render json: ItemSerializer.new(Item.find(params[:id]))
+        if Item.item_exists?(params[:id])
+          render json: ItemSerializer.new(Item.find(params[:id]))
+        else
+          render status: 404
+        end
       end
 
       def create
-        render json: ItemSerializer.new(Item.create(item_params)), status: :created
+        item = Item.create(item_params)
+        if item.save
+          render json: ItemSerializer.new(item), status: :created
+        else
+          render json: { data: { errors: item.errors.full_messages } }
+        end
       end
 
       def update
         item = Item.update(params[:id], item_params)
         if item.save
-          render json: ItemSerializer.new(item)
+          render json: ItemSerializer.new(item), status: :created
         else
           render status: 404
         end
       end
 
       def destroy
-        render json: Item.delete(params[:id])
+        Item.delete(params[:id])
+        render status: 204
       end
 
       private
