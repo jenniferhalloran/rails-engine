@@ -16,7 +16,12 @@ module Api
       end
 
       def create
-        render json: ItemSerializer.new(Item.create(item_params)), status: :created
+        item = Item.create(item_params)
+        if item.save
+          render json: ItemSerializer.new(item), status: :created
+        else
+          render json: { data: { errors: item.errors.full_messages }}
+        end
       end
 
       def update

@@ -96,26 +96,45 @@ RSpec.describe 'Items API' do
     end
   end
 
-  describe 'create an item endpoint' do
-    it 'can create a new item' do
-      id = create(:merchant).id
-      item_params = {
-        name: 'Schmidts Suede Pants',
-        description: "I can't cure damaged suede",
-        unit_price: 199.0,
-        merchant_id: id
-      }
-      post '/api/v1/items', params: { item: item_params }, as: :json
+  describe 'POST /api/v1/items endpoint' do
+    describe 'happy path' do
+      it 'can create an item' do
+        id = create(:merchant).id
+        item_params = {
+          name: 'Schmidts Suede Pants',
+          description: "I can't cure damaged suede",
+          unit_price: 199.0,
+          merchant_id: id
+        }
+        post '/api/v1/items', params: { item: item_params }, as: :json
+        expect(response.status).to eq(201)
+        
+        item = Item.last
+        
+        expect(item.id).to be_an(Integer)
+        expect(item.name).to eq('Schmidts Suede Pants')
+        expect(item.description).to eq("I can't cure damaged suede")
+        expect(item.unit_price).to eq(199.0)
+        expect(item.merchant_id).to eq(id)
+      end
+    end
+    
+    describe 'sad path' do
+      it 'returns an error if any attribute is missing' do
+        id = create(:merchant).id
+        item_params = {
+          name: 'Schmidts Suede Pants',
+          description: "I can't cure damaged suede",
+          merchant_id: id
+        }
+        post '/api/v1/items', params: { item: item_params }, as: :json
+        
+        expect(response.status).to eq(200)
 
-      expect(response.status).to eq(201)
-
-      item = Item.last
-
-      expect(item.id).to be_an(Integer)
-      expect(item.name).to eq('Schmidts Suede Pants')
-      expect(item.description).to eq("I can't cure damaged suede")
-      expect(item.unit_price).to eq(199.0)
-      expect(item.merchant_id).to eq(id)
+        error = JSON.parse(response.body, symbolize_names: true)[:data]
+        
+        expect(error[:errors].first).to eq("Unit price can't be blank")
+      end
     end
   end
 
