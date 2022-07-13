@@ -92,4 +92,24 @@ RSpec.describe 'Merchants API' do
     expect(result).to have_key(:data)
     expect(result[:data][:errors]).to eq('No match was found.')
   end
+
+  # it "can return all merchants that match the search terms" do
+  #   create(:merchant, name: 'Lands End')
+  #   create(:merchant, name: 'Crate And Barrel')
+  #   create(:merchant, name: 'REI')
+  #   create(:merchant, name: 'Patagonia')
+
+  #   get '/api/v1/merchants/find_all?name=And'
+
+  #   expect(response.status).to eq(200)
+
+  #   result = JSON.parse(response.body, symbolize_names: true)[:data]
+
+  #   # expect(result).to have_key(:id)
+
+  #   # expect(result[:attributes]).to have_key(:name)
+  #   # expect(result[:attributes][:name]).to eq('Crate And Barrel')
+  #   # expect(result[:attributes][:name]).to_not eq('Lands End')
+  # end
+  
 end
