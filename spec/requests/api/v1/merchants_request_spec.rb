@@ -72,17 +72,20 @@ RSpec.describe 'Merchants API' do
         expect(merchant[:attributes][:name]).to be_a(String)
       end
     end
-      describe 'sad path' do
-        it 'returns a 404 status if the id is not valid' do
-          id = create(:merchant).id
+    describe 'sad path' do
+      it 'returns a 404 status if the id is not valid' do
+        id = create(:merchant).id
 
-          get "/api/v1/merchants/#{id+1}"
+        get "/api/v1/merchants/#{id+1}"
 
-          expect(response.status).to eq(404)
-        end
+        expect(response.status).to eq(404)
+
+        get "/api/v1/merchants/one"
+
+        expect(response.status).to eq(404)
       end
+    end
   end 
-  # #Sad path??
 
   describe 'get all items for a given merchant id endpoint' do
     it 'returns all items for a given merchant id' do
