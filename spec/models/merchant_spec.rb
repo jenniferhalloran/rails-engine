@@ -17,5 +17,14 @@ RSpec.describe Merchant, type: :model do
         expect(Merchant.name_search_first('and')).to eq(merchant2)
       end
     end
+
+    describe 'merchant_exists?(id)' do
+      it 'returns true if a merchant exists with the given id, and false if not' do
+        merchant1 = create(:merchant, name: 'Lands End')
+
+        expect(Merchant.merchant_exists?(merchant1.id)).to eq(true)
+        expect(Merchant.merchant_exists?(merchant1.id+1)).to eq(false)
+      end
+    end
   end
 end

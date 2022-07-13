@@ -4,43 +4,84 @@ require 'rails_helper'
 
 RSpec.describe 'Merchants API' do
 
-  describe 'get all merchants endpoint' do
-    it 'sends a list of merchants' do
-      create_list(:merchant, 3)
+  describe 'GET /api/v1/merchants endpoint' do
+    describe 'happy path' do
+      it 'gets all merchants' do
+        create_list(:merchant, 3)
 
-      get '/api/v1/merchants'
+        get '/api/v1/merchants'
 
-      expect(response.status).to eq(200)
+        expect(response.status).to eq(200)
 
-      merchants = JSON.parse(response.body, symbolize_names: true)[:data]
+        merchants = JSON.parse(response.body, symbolize_names: true)[:data]
 
-      expect(merchants.count).to eq(3)
+        expect(merchants.count).to eq(3)
 
-      merchants.each do |merchant|
+        merchants.each do |merchant|
+          expect(merchant).to have_key(:id)
+
+          expect(merchant[:attributes]).to have_key(:name)
+          expect(merchant[:attributes][:name]).to be_a(String)
+        end
+      end
+
+      it 'returns an array of data even if there is one merchant found' do
+        create(:merchant)
+
+        get '/api/v1/merchants'
+
+        expect(response.status).to eq(200)
+
+        merchants = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(merchants.count).to eq(1)
+        expect(merchants).to be_an(Array)
+        expect(merchants.first).to have_key(:id)
+        expect(merchants.first[:attributes]).to have_key(:name)
+        expect(merchants.first[:attributes][:name]).to be_a(String)
+      end
+    end
+
+    describe 'sad path' do
+      it 'returns an array of data even if zero merchants are found' do
+
+        get '/api/v1/merchants'
+
+        expect(response.status).to eq(200)
+
+        merchants = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(merchants).to be_an(Array)
+      end
+    end
+  end
+
+  describe 'GET /api/v1/merchants/:id endpoint' do
+    describe 'happy path' do
+      it 'can return one merchant by its id' do
+        id = create(:merchant).id
+        get "/api/v1/merchants/#{id}"
+
+        expect(response.status).to eq(200)
+
+        merchant = JSON.parse(response.body, symbolize_names: true)[:data]
+
         expect(merchant).to have_key(:id)
 
         expect(merchant[:attributes]).to have_key(:name)
         expect(merchant[:attributes][:name]).to be_a(String)
       end
     end
-  end
+      describe 'sad path' do
+        it 'returns a 404 status if the id is not valid' do
+          id = create(:merchant).id
 
-  describe 'get one merchant endpoint' do
-    it 'can return one merchant by its id' do
-      id = create(:merchant).id
-      get "/api/v1/merchants/#{id}"
+          get "/api/v1/merchants/#{id+1}"
 
-      expect(response.status).to eq(200)
-
-      merchant = JSON.parse(response.body, symbolize_names: true)[:data]
-
-      expect(merchant).to have_key(:id)
-
-      expect(merchant[:attributes]).to have_key(:name)
-      expect(merchant[:attributes][:name]).to be_a(String)
-    end
+          expect(response.status).to eq(404)
+        end
+      end
   end 
-
   # #Sad path??
 
   describe 'get all items for a given merchant id endpoint' do

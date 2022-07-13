@@ -9,4 +9,8 @@ class Merchant < ApplicationRecord
     # .order('LOWER(name)')   --> avoid deprecation warning
     .first
   end
+
+  def self.merchant_exists?(id)
+    where(id: id).exists?
+  end
 end
