@@ -8,7 +8,11 @@ module Api
       end
 
       def show
-        render json: ItemSerializer.new(Item.find(params[:id]))
+        if Item.item_exists?(params[:id])
+          render json: ItemSerializer.new(Item.find(params[:id]))
+        else
+          render status: 404
+        end
       end
 
       def create

@@ -20,5 +20,14 @@ RSpec.describe Item, type: :model do
         expect(Item.name_search_all('BOOT')).to match_array([item2, item3])
       end
     end
+
+    describe 'item_exists?(id)' do
+      it 'returns true if a item exists with the given id, and false if not' do
+        item = create(:item)
+
+        expect(Item.item_exists?(item.id)).to eq(true)
+        expect(Item.item_exists?(item.id+1)).to eq(false)
+      end
+    end
   end
 end

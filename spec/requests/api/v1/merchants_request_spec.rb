@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Merchants API' do
-
   describe 'GET /api/v1/merchants endpoint' do
     describe 'happy path' do
       it 'gets all merchants' do
@@ -72,7 +71,7 @@ RSpec.describe 'Merchants API' do
         expect(merchant[:attributes][:name]).to be_a(String)
       end
     end
-    describe 'sad path' do
+    describe 'edge cases' do
       it 'returns a 404 status if the id is not valid' do
         id = create(:merchant).id
 

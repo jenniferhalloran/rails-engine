@@ -8,4 +8,8 @@ class Item < ApplicationRecord
   def self.name_search_all(keyword)
     where('name ilike ?', "%#{keyword.downcase}%")
   end
+
+  def self.item_exists?(id)
+    where(id: id).exists?
+  end
 end
