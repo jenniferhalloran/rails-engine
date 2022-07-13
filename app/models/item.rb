@@ -4,6 +4,6 @@ class Item < ApplicationRecord
   belongs_to :merchant
 
   def self.name_search_all(keyword)
-    where('LOWER(name) like ?', "%#{keyword.downcase}%")
+    where('name ilike ?', "%#{keyword.downcase}%")
   end
 end
