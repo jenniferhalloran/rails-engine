@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :invoice do
-    merchant 
-    customer 
+    merchant
+    customer
     status { 'status' }
   end
 end

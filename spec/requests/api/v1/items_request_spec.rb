@@ -214,14 +214,14 @@ RSpec.describe 'Items API' do
 
         expect(response.status).to eq(204)
         expect(response.body).to be_empty
-        
+
         expect { Item.find(item.id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it 'deletes the invoice associated with the item if the item was the only item on the invoice' do
         item1 = create(:item)
         item2 = create(:item)
-        
+
         invoice1 = create(:invoice)
         invoice_item1 = create(:invoice_item, item: item1, invoice: invoice1)
 
@@ -245,34 +245,68 @@ RSpec.describe 'Items API' do
     end
   end
 
-  describe 'GET /api/v1/merchants/:id/items endpoint' do
+  describe 'GET /api/v1/items/find endpoint' do
     describe 'happy path' do
-      it 'gets all merchants for a given item ID' do
-        id = create(:merchant).id
-        item = create(:item, merchant_id: id)
+      before do
+        item1 = create(:item, name: 'Backpack', unit_price: 40.99)
+        item2 = create(:item, name: 'Hiking Boots', unit_price: 35.99)
+        item3 = create(:item, name: 'Gumboot', unit_price: 19.99)
+        item4 = create(:item, name: 'Tent', unit_price: 99.99)
+        item5 = create(:item, name: 'Harness', unit_price: 24.99)
+      end
+      it 'can return one item that matches a search term by partial name' do
+        get '/api/v1/items/find?name=boot'
 
-        get "/api/v1/items/#{item.id}/merchant"
+        expect(response.status).to eq(200)
+        item = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(item[:attributes]).to include(:name, :description, :unit_price, :merchant_id)
+        expect(item[:attributes][:name]).to be_a(String)
+        expect(item[:attributes][:description]).to be_a(String)
+        expect(item[:attributes][:unit_price]).to be_a(Float)
+        expect(item[:attributes][:merchant_id]).to be_an(Integer)
+      end
+
+      it 'can return one item that has a price greater than or equal to a minimum price' do
+        get '/api/v1/items/find?min_price=20'
 
         expect(response.status).to eq(200)
 
-        merchant = JSON.parse(response.body, symbolize_names: true)[:data]
+        item = JSON.parse(response.body, symbolize_names: true)[:data]
 
-        expect(merchant).to have_key(:id)
+        expect(item[:attributes]).to include(:name, :description, :unit_price, :merchant_id)
+        expect(item[:attributes][:name]).to be_a(String)
+        expect(item[:attributes][:description]).to be_a(String)
+        expect(item[:attributes][:unit_price]).to be_a(Float)
+        expect(item[:attributes][:merchant_id]).to be_an(Integer)
+      end
+    end
+    describe 'sad path' do
+      it 'is successful but returns a no match error if no matches are present' do
+        get '/api/v1/items/find?name=cat'
 
-        expect(merchant[:attributes]).to have_key(:name)
-        expect(merchant[:attributes][:name]).to be_a(String)
+        expect(response.status).to eq(200)
+        result = JSON.parse(response.body, symbolize_names: true)[:data]
+        expect(result[:error]).to eq('Item not found')
+      end
+      it 'returns a bad request if min_price or max_price is less than zero' do
+        get '/api/v1/items/find?min_price=-20'
+
+        expect(response.status).to eq(400)
       end
     end
   end
+
   describe 'GET /api/v1/items/find_all endpoint' do
     describe 'happy path' do
-      it 'can return all items that match a search term' do
-        item1 = create(:item, name: 'Backpack')
-        item2 = create(:item, name: 'Hiking Boots')
-        item2 = create(:item, name: 'Gumboot')
-        item3 = create(:item, name: 'Tent')
-        item4 = create(:item, name: 'Harness')
-
+      before do
+        item1 = create(:item, name: 'Backpack', unit_price: 40.99)
+        item2 = create(:item, name: 'Hiking Boots', unit_price: 35.99)
+        item3 = create(:item, name: 'Gumboot', unit_price: 19.99)
+        item4 = create(:item, name: 'Tent', unit_price: 99.99)
+        item5 = create(:item, name: 'Harness', unit_price: 24.99)
+      end
+      it 'can return all items that match a search term by partial name' do
         get '/api/v1/items/find_all?name=boot'
 
         expect(response.status).to eq(200)
@@ -290,21 +324,80 @@ RSpec.describe 'Items API' do
           expect(item[:attributes][:merchant_id]).to be_an(Integer)
         end
       end
-      describe 'sad path' do
-        it 'does not return a 404 error if there are no matches' do
-          create(:item, name: 'Backpack')
-          create(:item, name: 'Tent')
-          create(:item, name: 'Harness')
-    
-          get '/api/v1/items/find_all?name=boot'
-    
-          expect(response.status).to eq(200)
-    
-          result = JSON.parse(response.body, symbolize_names: true)
-    
-          expect(result).to have_key(:data)
-          expect(result[:data]).to eq([])
+
+      it 'can return all items that have a price greater than or equal to a minimum price' do
+        get '/api/v1/items/find_all?min_price=29.99'
+
+        expect(response.status).to eq(200)
+
+        items = JSON.parse(response.body, symbolize_names: true)[:data]
+        expect(items.count).to eq(3)
+
+        items.each do |item|
+          expect(item).to have_key(:id)
+          expect(item[:attributes]).to include(:name, :description, :unit_price, :merchant_id)
+
+          expect(item[:attributes][:name]).to be_a(String)
+          expect(item[:attributes][:description]).to be_a(String)
+          expect(item[:attributes][:unit_price]).to be_a(Float)
+          expect(item[:attributes][:merchant_id]).to be_an(Integer)
         end
+      end
+
+      it 'can return all items that have a price less than or equal to a maximum price' do
+        get '/api/v1/items/find_all?max_price=50.00'
+
+        expect(response.status).to eq(200)
+
+        items = JSON.parse(response.body, symbolize_names: true)[:data]
+        expect(items.count).to eq(4)
+
+        items.each do |item|
+          expect(item).to have_key(:id)
+          expect(item[:attributes]).to include(:name, :description, :unit_price, :merchant_id)
+
+          expect(item[:attributes][:name]).to be_a(String)
+          expect(item[:attributes][:description]).to be_a(String)
+          expect(item[:attributes][:unit_price]).to be_a(Float)
+          expect(item[:attributes][:merchant_id]).to be_an(Integer)
+        end
+      end
+
+      it 'can return all items that have a price less than or equal to a maximum price and greater than or equal to a minimum price' do
+        get '/api/v1/items/find_all?max_price=50&min_price=29.99'
+
+        expect(response.status).to eq(200)
+
+        items = JSON.parse(response.body, symbolize_names: true)[:data]
+        expect(items.count).to eq(2)
+
+        items.each do |item|
+          expect(item).to have_key(:id)
+          expect(item[:attributes]).to include(:name, :description, :unit_price, :merchant_id)
+
+          expect(item[:attributes][:name]).to be_a(String)
+          expect(item[:attributes][:description]).to be_a(String)
+          expect(item[:attributes][:unit_price]).to be_a(Float)
+          expect(item[:attributes][:merchant_id]).to be_an(Integer)
+        end
+      end
+    end
+    describe 'sad path' do
+      it 'does not return a 404 if there are no matches, just an empty data array' do
+        get '/api/v1/items/find_all?name=cat'
+
+        expect(response.status).to eq(200)
+
+        result = JSON.parse(response.body, symbolize_names: true)
+
+        expect(result).to have_key(:data)
+        expect(result[:data]).to eq([]) # 'The JSON response will always be an array of objects, even if zero matches or only one match is found.'
+      end
+
+      it 'returns status code 400 if search fields include both name and price' do
+        get '/api/v1/items/find_all?name=cat&min_price=10'
+
+        expect(response).to have_http_status(400)
       end
     end
   end

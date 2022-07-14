@@ -18,6 +18,16 @@ RSpec.describe Merchant, type: :model do
       end
     end
 
+    describe 'name_search_all(keyword)' do
+      it 'returns all matching merchants' do
+        merchant1 = create(:merchant, name: 'Lands End')
+        merchant2 = create(:merchant, name: 'Crate And Barrel')
+        merchant3 = create(:merchant, name: 'REI')
+        merchant4 = create(:merchant, name: 'Patagonia')
+        expect(Merchant.name_search_all('and')).to match_array([merchant1, merchant2])
+      end
+    end
+
     describe 'merchant_exists?(id)' do
       it 'returns true if a merchant exists with the given id, and false if not' do
         merchant = create(:merchant)
