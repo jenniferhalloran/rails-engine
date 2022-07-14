@@ -5,6 +5,6 @@ FactoryBot.define do
     association :merchant
     name { Faker::Commerce.product_name }
     description { Faker::TvShows::NewGirl.quote }
-    unit_price { Faker::Number.between(from: 1, to: 300_000) }
+    unit_price { Faker::Number.between(from: 1, to: 10_000) }
   end
 end

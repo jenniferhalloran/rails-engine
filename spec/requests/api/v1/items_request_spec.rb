@@ -213,12 +213,36 @@ RSpec.describe 'Items API' do
         delete "/api/v1/items/#{item.id}"
 
         expect(response.status).to eq(204)
-        expect(response.body).to eq('') # not sure if this is exactly what was meant by not return any json body?
-
+        expect(response.body).to be_empty
+        
         expect { Item.find(item.id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
+
+      it 'deletes the invoice associated with the item if the item was the only item on the invoice' do
+        item1 = create(:item)
+        item2 = create(:item)
+        
+        invoice1 = create(:invoice)
+        invoice_item1 = create(:invoice_item, item: item1, invoice: invoice1)
+
+        invoice2 = create(:invoice)
+        invoice_item2 = create(:invoice_item, item: item1, invoice: invoice2)
+        invoice_item3 = create(:invoice_item, item: item2, invoice: invoice2)
+
+        delete "/api/v1/items/#{item1.id}"
+
+        expect { Invoice.find(invoice1.id) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect(Invoice.find(invoice2.id)).to eq(invoice2)
+      end
     end
-    # should I add sad path for trying to delete an item that doesn't exist?
+
+    describe 'sad path' do
+      # it 'returns a 404 response and error message if item does not exist' do
+      #   delete "/api/v1/items/3"
+
+      #   expect(response).to have_status(404)
+      # end
+    end
   end
 
   describe 'GET /api/v1/merchants/:id/items endpoint' do

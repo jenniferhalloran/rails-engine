@@ -34,7 +34,10 @@ module Api
       end
 
       def destroy
-        Item.delete(params[:id])
+        item = Item.find(params[:id])
+        item.delete_single_invoices
+        item.destroy
+
         render status: 204
       end
 
