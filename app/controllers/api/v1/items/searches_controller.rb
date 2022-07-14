@@ -34,8 +34,8 @@ class Api::V1::Items::SearchesController < ApplicationController
   end
 
   def bad_request?
-    return true if params[:name] && (params[:min_price] || params[:max_price])
-    return true if params[:max_price] && params[:max_price].to_i < 0
+    return true if params[:name] && ((params[:min_price] || params[:max_price]) || (params[:name].nil? || params[:name].empty?))
+    return true if params[:max_price] && params[:max_price].to_i < 0 
     return true if params[:min_price] && params[:min_price].to_i < 0
   end
 
