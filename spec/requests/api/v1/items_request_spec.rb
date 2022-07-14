@@ -214,14 +214,14 @@ RSpec.describe 'Items API' do
 
         expect(response.status).to eq(204)
         expect(response.body).to be_empty
-        
+
         expect { Item.find(item.id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it 'deletes the invoice associated with the item if the item was the only item on the invoice' do
         item1 = create(:item)
         item2 = create(:item)
-        
+
         invoice1 = create(:invoice)
         invoice_item1 = create(:invoice_item, item: item1, invoice: invoice1)
 
@@ -279,18 +279,17 @@ RSpec.describe 'Items API' do
         expect(item[:attributes][:description]).to be_a(String)
         expect(item[:attributes][:unit_price]).to be_a(Float)
         expect(item[:attributes][:merchant_id]).to be_an(Integer)
-
       end
     end
     describe 'sad path' do
-      it 'is successful but returns a no match error if no matches are present' do 
+      it 'is successful but returns a no match error if no matches are present' do
         get '/api/v1/items/find?name=cat'
 
         expect(response.status).to eq(200)
-        result = JSON.parse(response.body, symbolize_names: true)[:data] 
-        expect(result[:error]).to eq("Item not found")
+        result = JSON.parse(response.body, symbolize_names: true)[:data]
+        expect(result[:error]).to eq('Item not found')
       end
-      it 'returns a bad request if min_price or max_price is less than zero' do 
+      it 'returns a bad request if min_price or max_price is less than zero' do
         get '/api/v1/items/find?min_price=-20'
 
         expect(response.status).to eq(400)
@@ -332,7 +331,7 @@ RSpec.describe 'Items API' do
         expect(response.status).to eq(200)
 
         items = JSON.parse(response.body, symbolize_names: true)[:data]
-        expect(items.count).to eq(2)
+        expect(items.count).to eq(3)
 
         items.each do |item|
           expect(item).to have_key(:id)
@@ -385,19 +384,18 @@ RSpec.describe 'Items API' do
     end
     describe 'sad path' do
       it 'does not return a 404 if there are no matches, just an empty data array' do
-
         get '/api/v1/items/find_all?name=cat'
-  
+
         expect(response.status).to eq(200)
-  
+
         result = JSON.parse(response.body, symbolize_names: true)
-  
+
         expect(result).to have_key(:data)
-        expect(result[:data]).to eq([]) #'The JSON response will always be an array of objects, even if zero matches or only one match is found.'
+        expect(result[:data]).to eq([]) # 'The JSON response will always be an array of objects, even if zero matches or only one match is found.'
       end
 
       it 'returns status code 400 if search fields include both name and price' do
-        get "/api/v1/items/find_all?name=cat&min_price=10"
+        get '/api/v1/items/find_all?name=cat&min_price=10'
 
         expect(response).to have_http_status(400)
       end

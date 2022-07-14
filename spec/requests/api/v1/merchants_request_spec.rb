@@ -7,7 +7,6 @@ RSpec.describe 'Merchants API' do
     describe 'happy path' do
       it 'gets all merchants' do
         create_list(:merchant, 3)
-
         get '/api/v1/merchants'
 
         expect(response.status).to eq(200)
@@ -18,7 +17,6 @@ RSpec.describe 'Merchants API' do
 
         merchants.each do |merchant|
           expect(merchant).to have_key(:id)
-
           expect(merchant[:attributes]).to have_key(:name)
           expect(merchant[:attributes][:name]).to be_a(String)
         end
@@ -70,7 +68,7 @@ RSpec.describe 'Merchants API' do
         expect(merchant[:attributes][:name]).to be_a(String)
       end
     end
-    describe 'edge cases' do
+    describe 'sad path' do
       it 'returns a 404 status if the id is not valid' do
         id = create(:merchant).id
 
@@ -106,7 +104,7 @@ RSpec.describe 'Merchants API' do
         expect(result[:attributes][:name]).to_not eq('Lands End')
       end
     end
-    
+
     describe 'sad path' do
       it 'does not return a 404 error if there are no matches' do
         create(:merchant, name: 'Lands End')
@@ -119,6 +117,7 @@ RSpec.describe 'Merchants API' do
         expect(response.status).to eq(200)
 
         result = JSON.parse(response.body, symbolize_names: true)
+
         expect(result).to have_key(:data)
         expect(result[:data][:errors]).to eq('No match was found.')
       end
@@ -127,7 +126,7 @@ RSpec.describe 'Merchants API' do
 
   describe 'GET /api/v1/merchants/find_all' do
     describe 'happy path' do
-      it "find all merchants by name fragment" do
+      it 'find all merchants by name fragment' do
         create(:merchant, name: 'Lands End')
         create(:merchant, name: 'Crate And Barrel')
         create(:merchant, name: 'REI')
@@ -137,31 +136,15 @@ RSpec.describe 'Merchants API' do
 
         expect(response.status).to eq(200)
         merchants = JSON.parse(response.body, symbolize_names: true)[:data]
-
+      
         expect(merchants.count).to eq(2)
 
-        
+        merchants.each do |merchant|
+          expect(merchant).to have_key(:id)
+          expect(merchant[:attributes]).to have_key(:name)
+          expect(merchant[:attributes][:name]).to be_a(String)
+        end
       end
-      
     end
   end
-
-  # it "can return all merchants that match the search terms" do
-  #   create(:merchant, name: 'Lands End')
-  #   create(:merchant, name: 'Crate And Barrel')
-  #   create(:merchant, name: 'REI')
-  #   create(:merchant, name: 'Patagonia')
-
-  #   get '/api/v1/merchants/find_all?name=And'
-
-  #   expect(response.status).to eq(200)
-
-  #   result = JSON.parse(response.body, symbolize_names: true)[:data]
-
-  #   # expect(result).to have_key(:id)
-
-  #   # expect(result[:attributes]).to have_key(:name)
-  #   # expect(result[:attributes][:name]).to eq('Crate And Barrel')
-  #   # expect(result[:attributes][:name]).to_not eq('Lands End')
-  # end
 end
