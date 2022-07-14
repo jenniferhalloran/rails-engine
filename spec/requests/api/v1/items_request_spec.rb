@@ -245,25 +245,6 @@ RSpec.describe 'Items API' do
     end
   end
 
-  describe 'GET /api/v1/merchants/:id/items endpoint' do
-    describe 'happy path' do
-      it 'gets all merchants for a given item ID' do
-        id = create(:merchant).id
-        item = create(:item, merchant_id: id)
-
-        get "/api/v1/items/#{item.id}/merchant"
-
-        expect(response.status).to eq(200)
-
-        merchant = JSON.parse(response.body, symbolize_names: true)[:data]
-
-        expect(merchant).to have_key(:id)
-
-        expect(merchant[:attributes]).to have_key(:name)
-        expect(merchant[:attributes][:name]).to be_a(String)
-      end
-    end
-  end
   describe 'GET /api/v1/items/find_all endpoint' do
     describe 'happy path' do
       it 'can return all items that match a search term' do
