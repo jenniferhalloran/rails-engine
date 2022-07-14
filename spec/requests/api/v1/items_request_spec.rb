@@ -245,7 +245,7 @@ RSpec.describe 'Items API' do
     end
   end
 
-  describe 'GET /api/v1/items/find_all endpoint' do
+  describe 'GET /api/v1/items/find endpoint' do
     describe 'happy path' do
       before do
         item1 = create(:item, name: 'Backpack', unit_price: 40.99)
@@ -254,12 +254,13 @@ RSpec.describe 'Items API' do
         item4 = create(:item, name: 'Tent', unit_price: 99.99)
         item5 = create(:item, name: 'Harness', unit_price: 24.99)
       end
-      it 'can return all items that match a search term by partial name' do
-        get '/api/v1/items/find_all?name=boot'
+      it 'can return one item that matches a search term by partial name' do
+        get '/api/v1/items/find?name=boot'
 
         expect(response.status).to eq(200)
+        items = JSON.parse(response.body, symbolize_names: true)[:data]    
       end
-      
+
     end
   end
 

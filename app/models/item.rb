@@ -8,8 +8,10 @@ class Item < ApplicationRecord
   validates_presence_of :name, :description, :unit_price
   validates_numericality_of :unit_price
 
-  def self.name_search_all(keyword)
+  def self.name_search_all(keyword, limit = nil)
     where('name ilike ?', "%#{keyword.downcase}%")
+    .limit(limit)
+
   end
 
   def self.price_search_all(min_price: "0", max_price: nil)

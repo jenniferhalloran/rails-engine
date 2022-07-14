@@ -11,17 +11,30 @@ module Api
           else
             matches = search_all_items
             if matches == []
-              render json: { data: [], error: "No matches  Found"}
+              render json: { data: [], error: "No matches found"}
             else
               render json: ItemSerializer.new(matches)
             end
           end
         end
 
+        def show
+          if bad_request?
+            render json: {data: [], error: "Bad request"}, status: :bad_request
+          else
+            match = search_all_items(1)
+            if match == []
+              render json: {data: {error: 'Item not found'}}
+            else
+              render json: ItemSerializer.new(match.first)
+            end
+          end
+        end
+
         private 
 
-        def search_all_items 
-          return Item.name_search_all(params[:name]) if params[:name]
+        def search_all_items(limit = nil)
+          return Item.name_search_all(params[:name], limit) if params[:name]
           return Item.price_search_all(min_price: params[:min_price], max_price: params[:max_price]) if params[:min_price] || params[:max_price]
         end
 
