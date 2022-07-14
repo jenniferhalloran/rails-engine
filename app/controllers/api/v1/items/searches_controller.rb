@@ -9,7 +9,7 @@ module Api
           if bad_request?
             render json: {data: [], error: "Bad request"}, status: :bad_request
           else
-            matches = search_all_items
+            matches = search_items
             if matches == []
               render json: { data: [], error: "No matches found"}
             else
@@ -22,7 +22,7 @@ module Api
           if bad_request?
             render json: {data: [], error: "Bad request"}, status: :bad_request
           else
-            match = search_all_items(1)
+            match = search_items(1)
             if match == []
               render json: {data: {error: 'Item not found'}}
             else
@@ -33,9 +33,9 @@ module Api
 
         private 
 
-        def search_all_items(limit = nil)
-          return Item.name_search_all(params[:name], limit) if params[:name]
-          return Item.price_search_all(min_price: params[:min_price], max_price: params[:max_price]) if params[:min_price] || params[:max_price]
+        def search_items(limit = nil)
+          return Item.name_search(params[:name], limit) if params[:name]
+          return Item.price_search(min_price: params[:min_price], max_price: params[:max_price]) if params[:min_price] || params[:max_price]
         end
 
         def bad_request?

@@ -258,9 +258,24 @@ RSpec.describe 'Items API' do
         get '/api/v1/items/find?name=boot'
 
         expect(response.status).to eq(200)
-        items = JSON.parse(response.body, symbolize_names: true)[:data]    
-      end
+        item = JSON.parse(response.body, symbolize_names: true)[:data]
 
+        expect(item[:attributes]).to include(:name, :description, :unit_price, :merchant_id)
+        expect(item[:attributes][:name]).to be_a(String)
+        expect(item[:attributes][:description]).to be_a(String)
+        expect(item[:attributes][:unit_price]).to be_a(Float)
+        expect(item[:attributes][:merchant_id]).to be_an(Integer)
+      end
+    end
+    describe 'sad path' do
+      it 'is successful but returns a no match error if no matches are present' do 
+        get '/api/v1/items/find?name=cat'
+
+        expect(response.status).to eq(200)
+        result = JSON.parse(response.body, symbolize_names: true)[:data] 
+        # require 'pry'; binding.pry
+        expect(result[:error]).to eq("Item not found")
+      end
     end
   end
 
