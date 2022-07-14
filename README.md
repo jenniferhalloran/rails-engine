@@ -32,7 +32,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This E-Commerce application API provides users access to data about merchants, items, customers, invoices, and transactions. It is built using ruby on rails. It provides users access to the following endpoints:
+This E-Commerce application API provides users access to data about merchants and items. 
 
   ### Built With
 
