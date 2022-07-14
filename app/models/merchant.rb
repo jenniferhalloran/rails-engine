@@ -10,6 +10,11 @@ class Merchant < ApplicationRecord
       .first
   end
 
+  def self.name_search_all(keyword)
+    where('name ilike ?', "%#{keyword.downcase}%")
+    .order(arel_table['name'].lower)
+  end
+
   def self.merchant_exists?(id)
     where(id: id).exists?
   end

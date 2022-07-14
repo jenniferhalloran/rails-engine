@@ -14,9 +14,11 @@ class Item < ApplicationRecord
 
   end
 
-  def self.price_search(min_price: "0", max_price: nil)
+  def self.price_search(limit, min_price: "0", max_price: nil)
     max_price = Item.maximum(:unit_price).to_s if max_price.nil?
     where("unit_price >= #{min_price.to_i} AND unit_price <= #{max_price.to_i}")
+    .limit(limit)
+    .order(:name)
   end
 
   def self.item_exists?(id)

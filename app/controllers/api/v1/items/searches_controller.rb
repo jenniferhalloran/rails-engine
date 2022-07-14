@@ -35,11 +35,13 @@ module Api
 
         def search_items(limit = nil)
           return Item.name_search(params[:name], limit) if params[:name]
-          return Item.price_search(min_price: params[:min_price], max_price: params[:max_price]) if params[:min_price] || params[:max_price]
+          return Item.price_search(limit, min_price: params[:min_price], max_price: params[:max_price]) if params[:min_price] || params[:max_price]
         end
 
         def bad_request?
-          params[:name] && (params[:min_price] || params[:max_price])
+          return true if params[:name] && (params[:min_price] || params[:max_price])
+          return true if params[:max_price] && params[:max_price].to_i < 0
+          return true if params[:min_price] && params[:min_price].to_i < 0
         end
       end
     end

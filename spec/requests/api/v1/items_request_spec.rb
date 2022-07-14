@@ -266,6 +266,21 @@ RSpec.describe 'Items API' do
         expect(item[:attributes][:unit_price]).to be_a(Float)
         expect(item[:attributes][:merchant_id]).to be_an(Integer)
       end
+
+      it 'can return one item that has a price greater than or equal to a minimum price' do
+        get '/api/v1/items/find?min_price=20'
+
+        expect(response.status).to eq(200)
+
+        item = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(item[:attributes]).to include(:name, :description, :unit_price, :merchant_id)
+        expect(item[:attributes][:name]).to be_a(String)
+        expect(item[:attributes][:description]).to be_a(String)
+        expect(item[:attributes][:unit_price]).to be_a(Float)
+        expect(item[:attributes][:merchant_id]).to be_an(Integer)
+
+      end
     end
     describe 'sad path' do
       it 'is successful but returns a no match error if no matches are present' do 
@@ -273,8 +288,12 @@ RSpec.describe 'Items API' do
 
         expect(response.status).to eq(200)
         result = JSON.parse(response.body, symbolize_names: true)[:data] 
-        # require 'pry'; binding.pry
         expect(result[:error]).to eq("Item not found")
+      end
+      it 'returns a bad request if min_price or max_price is less than zero' do 
+        get '/api/v1/items/find?min_price=-20'
+
+        expect(response.status).to eq(400)
       end
     end
   end

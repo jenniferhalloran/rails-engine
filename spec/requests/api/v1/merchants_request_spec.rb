@@ -125,6 +125,27 @@ RSpec.describe 'Merchants API' do
     end
   end
 
+  describe 'GET /api/v1/merchants/find_all' do
+    describe 'happy path' do
+      it "find all merchants by name fragment" do
+        create(:merchant, name: 'Lands End')
+        create(:merchant, name: 'Crate And Barrel')
+        create(:merchant, name: 'REI')
+        create(:merchant, name: 'Patagonia')
+
+        get '/api/v1/merchants/find_all?name=And'
+
+        expect(response.status).to eq(200)
+        merchants = JSON.parse(response.body, symbolize_names: true)[:data]
+
+        expect(merchants.count).to eq(2)
+
+        
+      end
+      
+    end
+  end
+
   # it "can return all merchants that match the search terms" do
   #   create(:merchant, name: 'Lands End')
   #   create(:merchant, name: 'Crate And Barrel')
