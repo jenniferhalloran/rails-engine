@@ -11,6 +11,8 @@ Rails.application.routes.draw do
 
   get '/api/v1/items/:id/merchant', to: 'api/v1/merchant_items#show'
 
+  get '/api/v1/merchants/most_items', to: 'api/v1/merchants#most_items'
+
   namespace :api do
     namespace :v1 do
       resources :items, only: %i[index show create update destroy]
@@ -18,6 +20,11 @@ Rails.application.routes.draw do
       resources :merchants, only: %i[index show] do
         resources :items, only: %i[index], controller: :merchant_items
       end
+
+      namespace :revenue do 
+        resources :merchants, only: [:index]
+      end
+
     end
   end
 end

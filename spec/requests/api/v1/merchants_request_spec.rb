@@ -136,7 +136,7 @@ RSpec.describe 'Merchants API' do
 
         expect(response.status).to eq(200)
         merchants = JSON.parse(response.body, symbolize_names: true)[:data]
-      
+
         expect(merchants.count).to eq(2)
 
         merchants.each do |merchant|

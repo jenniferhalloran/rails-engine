@@ -13,12 +13,10 @@ class Api::V1::Items::SearchesController < ApplicationController
   def show
     if bad_request?
       render json: { data: [], error: 'Bad request' }, status: :bad_request
+    elsif search_items(1) == []
+      render json: { data: { error: 'Item not found' } }
     else
-      if search_items(1) == []
-        render json: { data: { error: 'Item not found' } }
-      else
-        render json: ItemSerializer.new(search_items(1).first)
-      end
+      render json: ItemSerializer.new(search_items(1).first)
     end
   end
 
@@ -34,9 +32,11 @@ class Api::V1::Items::SearchesController < ApplicationController
   end
 
   def bad_request?
-    return true if params[:name] && ((params[:min_price] || params[:max_price]) || (params[:name].nil? || params[:name].empty?))
-    return true if params[:max_price] && params[:max_price].to_i < 0 
-    return true if params[:min_price] && params[:min_price].to_i < 0
+    if params[:name] && ((params[:min_price] || params[:max_price]) || (params[:name].nil? || params[:name].empty?))
+      return true
+    end
+    return true if params[:max_price]&.to_i&.negative?
+    return true if params[:min_price]&.to_i&.negative?
   end
 
   def render_404
