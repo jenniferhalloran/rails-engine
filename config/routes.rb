@@ -13,6 +13,8 @@ Rails.application.routes.draw do
 
   get '/api/v1/merchants/most_items', to: 'api/v1/merchants#most_items'
 
+  get '/api/v1/revenue', to: 'api/v1/revenue#total_by_date'
+
   namespace :api do
     namespace :v1 do
       resources :items, only: %i[index show create update destroy]
